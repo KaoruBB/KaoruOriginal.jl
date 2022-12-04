@@ -4,6 +4,7 @@ module KaoruOriginal
     export showtable, makevisible, datascience
 
     using DataFrames
+    using Crayons
 
     function showtable(df)
         DataFrame([[names(df)];
@@ -12,8 +13,14 @@ module KaoruOriginal
     end
 
 
-    function makevisible()
-       Base.text_colors[:light_black] = Base.text_colors[:light_green]
+    function makevisible(color="light_green")
+        Base.text_colors[:light_black] = Base.text_colors[:light_green]
+        x = """ Base.display(df::AbstractDataFrame) = show(
+            df, subheader_crayon = DataFrames.crayon"$(color)"
+        )
+        """
+        x = Meta.parse(x)
+        eval(x)
     end
 
     # function change_col_colors(; kwargs...)
