@@ -1,7 +1,7 @@
 module KaoruOriginal
 # Write your package code here.
 
-    export showtable, makevisible, datascience
+    export showtable, makevisible, datascience, custom_sort
 
     using DataFrames
     using Crayons
@@ -21,6 +21,13 @@ module KaoruOriginal
         """
         x = Meta.parse(x)
         eval(x)
+    end
+
+    function custom_sort(categories)
+        ordering = Dict((j, i) for (i,j) in enumerate(categories))
+        return function (x, y)
+            ordering[x] < ordering[y]
+        end
     end
 
     # function change_col_colors(; kwargs...)
