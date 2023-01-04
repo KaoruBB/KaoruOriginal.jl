@@ -1,10 +1,11 @@
 module KaoruOriginal
 # Write your package code here.
 
-    export showtable, makevisible, datascience, custom_sort
+    export showtable, makevisible, datascience, custom_sort, show_html_df
 
     using DataFrames
     using Crayons
+    using BrowseTables
 
     function showtable(df)
         DataFrame([[names(df)];
@@ -27,6 +28,21 @@ module KaoruOriginal
         ordering = Dict((j, i) for (i,j) in enumerate(categories))
         return function (x, y)
             ordering[x] < ordering[y]
+        end
+    end
+
+    function show_html_df(df)
+        if nrow(df) < 1000
+            open_html_table(df)
+        else
+            let
+                tmp = copy(df)
+                cols = names(tmp)
+                tmp.index = 1:nrow(tmp)
+                open_html_table(
+                    vcat(tmp[1:50, ["index", cols...]], tmp[end-50:end, ["index", cols...]])
+                )
+            end
         end
     end
 
