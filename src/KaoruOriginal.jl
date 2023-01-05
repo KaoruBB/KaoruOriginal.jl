@@ -40,7 +40,7 @@ module KaoruOriginal
                 cols = names(tmp)
                 tmp.index = 1:nrow(tmp)
                 open_html_table(
-                    vcat(tmp[1:50, ["index", cols...]], tmp[end-50:end, ["index", cols...]])
+                    vcat(tmp[1:25, ["index", cols...]], tmp[end-25:end, ["index", cols...]])
                 )
             end
         end
