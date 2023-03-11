@@ -99,10 +99,10 @@ module KaoruOriginal
     end
 
     module table_func
-    export add_color_col, row_color_change, count_str, get_colvalue_max_width_list, get_colname_width_list, get_max_width_list
+    export add_colorname_col, row_color_change, count_str, get_colvalue_max_width_list, get_colname_width_list, get_max_width_list
 
         # colorというcolを追加
-        function add_color_col(
+        function add_colorname_col(
             df,
             middlle_c="rgb(239, 243, 255)",
             bottom_c="rgb(189, 215, 231)"
