@@ -1,7 +1,7 @@
 module KaoruOriginal
 # Write your package code here.
 
-    export showtable, makevisible, for_plotting, custom_sort, show_html_df
+    export showtable, makevisible, for_plotting, custom_sort, show_html_df, table_func
 
     using DataFrames
     using Crayons
@@ -48,55 +48,131 @@ module KaoruOriginal
 
 
     module for_plotting
-        export  kaoruoriginalhello
+        export  kaoruoriginalhello, hover_info
+        using DataFrames
 
-    function kaoruoriginalhello(x)
-            println("Hello, $x")
+        function kaoruoriginalhello(x)
+                println("Hello, $x")
+        end
+
+        """
+            hover_info(df::AbstractDataFrame, pair_list::Vector{Pair{Symbol, String}})
+
+        Return a vector of hover text.
+
+
+        # Examples
+
+        ```jldoctest
+        julia> df = DataFrame(
+            index=1:4,
+            name=["John", "Sally", "Kirk", "John"],
+            apple=[2, 4, 5, 6],
+            banana=[3,5,2,0]
+        )
+
+
+        julia> symbols_labels = [
+                :name => "名前",
+                :apple => "りんご",
+                :banana => "バナナ"
+            ]
+        3-element Vector{Pair{Symbol, String}}:
+        :name => "名前"
+        :apple => "りんご"
+        :banana => "バナナ"
+
+
+        julia> hover_info(df, symbols_labels)
+        4-element Vector{String}:
+        "名前: John<br>りんご: 2<br>バナナ: 3"
+        "名前: Sally<br>りんご: 4<br>バナナ: 5"
+        "名前: Kirk<br>りんご: 5<br>バナナ: 2"
+        "名前: John<br>りんご: 6<br>バナナ: 0"
+        ```
+        """
+        function hover_info(df, pair_list)
+            return [
+                join([name * ": " * string(df[i, col]) for (col, name) in pair_list], "<br>") for i in 1:nrow(df)
+            ]
+        end
     end
 
-    """
-        hover_info(df::AbstractDataFrame, pair_list::Vector{Pair{Symbol, String}})
+    module table_func
+    export add_color_col, row_color_change, count_str, get_colvalue_max_width_list, get_colname_width_list, get_max_width_list
 
-    Return a vector of hover text.
+        # colorというcolを追加
+        function add_color_col(
+            df,
+            middlle_c="rgb(239, 243, 255)",
+            bottom_c="rgb(189, 215, 231)"
+        )
+            tmpdf = copy(df)
+            tmpdf.color .= middlle_c
+            tmpdf[end, :color] = bottom_c
+            return tmpdf
+        end
 
+        # 特定の行の色の行を変更する関数
+        function row_color_change(
+            df
+            , color_specify_dict # keyにインデックス名，valueに色
+            , color_col=:color
+        )
+            for (k, v) in color_specify_dict
+                df[k, color_col] = v
+            end
 
-    # Examples
+            return df
+        end
 
-    ```jldoctest
-    julia> df = DataFrame(
-        index=1:4,
-        name=["John", "Sally", "Kirk", "John"],
-        apple=[2, 4, 5, 6],
-        banana=[3,5,2,0]
-    )
+        # <br>タグを除い文字列の数を返す関数
+        function count_str(str)
+            return maximum(length.(split(str, "<br>")))
+        end
 
+        # カラムのvalueのmax幅を出すリスト
+        function get_colvalue_max_width_list(df; normalize = false)
+            max_width_list = []
+            for col in eachcol(df)
+                push!(max_width_list, maximum([length(string(x)) for x in col]))
+            end
 
-    julia> symbols_labels = [
-            :name => "名前",
-            :apple => "りんご",
-            :banana => "バナナ"
-        ]
-    3-element Vector{Pair{Symbol, String}}:
-    :name => "名前"
-    :apple => "りんご"
-    :banana => "バナナ"
+            if normalize
+                max_width_list = max_width_list ./ sum(max_width_list)
+            end
 
+            return max_width_list
+        end
 
-    julia> hover_info(df, symbols_labels)
-    4-element Vector{String}:
-    "名前: John<br>りんご: 2<br>バナナ: 3"
-    "名前: Sally<br>りんご: 4<br>バナナ: 5"
-    "名前: Kirk<br>りんご: 5<br>バナナ: 2"
-    "名前: John<br>りんご: 6<br>バナナ: 0"
-    ```
-    """
-    function hover_info(df, pair_list)
-        return [
-            join([name * ": " * string(df[i, col]) for (col, name) in pair_list], "<br>") for i in 1:nrow(df)
-        ]
+        # カラム名の文字数を取得する関数
+        function get_colname_width_list(df; normalize = false)
+            colname_width_list = []
+            for colname in names(df)
+                push!(colname_width_list, count_str(colname))
+            end
+
+            if normalize
+                colname_width_list = colname_width_list ./ sum(colname_width_list)
+            end
+
+            return colname_width_list
+        end
+
+        # カラムごとのmax幅を出すリスト
+        function get_max_width_list(df; normalize = false)
+            max_width_list = []
+            for colname in names(df)
+                value_max = maximum([length(string(x)) for x in df[!,colname]])
+                colname_max = count_str(colname)
+                push!(max_width_list, maximum([value_max, colname_max]))
+            end
+
+            if normalize
+                max_width_list = max_width_list ./ sum(max_width_list)
+            end
+
+            return max_width_list
+        end
     end
-
-
-end
-
 end
