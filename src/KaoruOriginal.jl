@@ -49,7 +49,8 @@ module KaoruOriginal
 
     module for_plotting
         export  kaoruoriginalhello, hover_info, ppap
-        using DataFrames, PlotlyJS
+        using DataFrames
+        import PlotlyJS
 
         function kaoruoriginalhello(x)
                 println("Hello, $x")
