@@ -48,8 +48,8 @@ module KaoruOriginal
 
 
     module for_plotting
-        export  kaoruoriginalhello, hover_info
-        using DataFrames
+        export  kaoruoriginalhello, hover_info, ppap
+        using DataFrames, PlotlyJS
 
         function kaoruoriginalhello(x)
                 println("Hello, $x")
@@ -96,7 +96,16 @@ module KaoruOriginal
                 join([name * ": " * string(df[i, col]) for (col, name) in pair_list], "<br>") for i in 1:nrow(df)
             ]
         end
+
+        function ppap(p; percentage=100)
+            io = IOBuffer()
+            PlotlyJS.savefig(io, p, format="html")
+            htmlstring = decode(io.data, "utf-8")
+            HTML(string("<div width=$(percentage)%>", htmlstring, "</div>"))
+        end
+
     end
+
 
     module table_func
     export add_colorname_col, row_color_change, count_str, get_colvalue_max_width_list, get_colname_width_list, get_max_width_list
