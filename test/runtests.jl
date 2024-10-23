@@ -1,7 +1,7 @@
-using KaoruOriginal
+using KaoruOriginal.PlotHelpers
 using Test
 
 @testset "KaoruOriginal.jl" begin
     # Write your tests here.
-    Test.@test KaoruOriginal.hello() == "Hello World!"
+    @test kaoruoriginalhello("Elliot") == "Hello, Elliot"
 end
