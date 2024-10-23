@@ -1,10 +1,16 @@
 module KaoruOriginal
 
-export showtable, makevisible, for_plotting, custom_sort, show_html_df, table_func
-
 using DataFrames
 using Crayons
 using BrowseTables
+
+export
+    showtable,
+    makevisible,
+    for_plotting,
+    custom_sort,
+    show_html_df,
+    table_func
 
 function showtable(df)
     DataFrame([[names(df)];
